@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --background: #EFF6FF;
+  --foreground: #16201E;
+  --accent: #3B82F6;
+  --accent-dark: #2563EB;
+  --muted: #746F70;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.saas-card {
+  background-color: #ffffff;
+  border: 1px solid #BFDBFE;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(94, 187, 171, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.saas-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  background-color: #ffffff;
+  border: 1px solid #c5dfe8;
+  border-radius: 0.5rem;
+  color: #16201E;
+  transition: all 0.2s ease;
+}
+
+.saas-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(94, 187, 171, 0.15);
+}
+
+.saas-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}

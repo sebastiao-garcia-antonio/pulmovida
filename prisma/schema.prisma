@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoUsuario {
+  paciente
+  medico
+  admin
+}
+
+enum TipoPergunta {
+  booleano
+  escala
+  multipla
+}
+
+enum StatusAgendamento {
+  pendente
+  confirmado
+  realizado
+}
+
+model User {
+  id            String          @id @default(cuid()) @map("id")
+  name          String?         @map("nome")
+  email         String?         @unique @map("email")
+  emailVerified DateTime?       @map("email_verificado")
+  image         String?         @map("imagem")
+  senha         String?         @map("senha")
+  senhaTemporaria Boolean       @default(false) @map("senha_temporaria")
+  senhaTemporariaExpira DateTime? @map("senha_temporaria_expira")
+  tipo          TipoUsuario     @default(paciente) @map("tipo")
+  createdAt     DateTime        @default(now()) @map("criado_em")
+
+  accounts      Account[]
+  sessions      Session[]
+
+  paciente      Paciente?
+  medico        Medico?
+
+  @@map("usuarios")
+}
+
+model Paciente {
+  id             String   @id @default(cuid())
+  userId         String   @unique @map("user_id")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dataNascimento DateTime? @db.Date @map("data_nascimento")
+  genero         String?
+  telefone       String?
+
+  // Preferências
+  notificarEmail    Boolean @default(true) @map("notificar_email")
+  notificarSMS      Boolean @default(false) @map("notificar_sms")
+  notificarWhatsApp Boolean @default(true) @map("notificar_whatsapp")
+  lembreteConsulta  Boolean @default(true) @map("lembrete_consulta")
+  lembreteAntesHoras Int    @default(24) @map("lembrete_antes_horas")
+  compartilharDados Boolean @default(true) @map("compartilhar_dados")
+
+  diagnosticos Diagnostico[]
+  respostas    RespostasPaciente[]
+  agendamentos Agendamento[]
+  consultas    Consulta[]
+
+  @@map("pacientes")
+}
+
+model Departamento {
+  id    String @id @default(uuid())
+  nome  String @map("nome")
+  icone String @default("Stethoscope") @map("icone")
+
+  medicos Medico[]
+
+  @@map("departamentos")
+}
+
+model Medico {
+  id              String        @id @default(cuid())
+  userId          String        @unique @map("user_id")
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  especialidade   String?       @map("especialidade")
+  departamentoId  String?       @map("departamento_id")
+  departamento    Departamento? @relation(fields: [departamentoId], references: [id], onDelete: SetNull)
+
+  agendas         Agenda[]
+  agendamentos    Agendamento[]
+  consultas       Consulta[]
+
+  @@map("medicos")
+}
+
+model Pergunta {
+  id        String        @id @default(uuid())
+  texto     String        @map("texto")
+  tipo      TipoPergunta  @map("tipo")
+  categoria String?       @map("categoria")
+  peso      Int           @default(1) @map("peso")
+
+  opcoes    OpcaoResposta[]
+  respostas RespostasPaciente[]
+
+  @@map("perguntas")
+}
+
+model OpcaoResposta {
+  id         String  @id @default(uuid())
+  perguntaId String  @map("pergunta_id")
+  pergunta   Pergunta @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  texto      String  @map("texto")
+  valor      Int     @map("valor")
+
+  respostas  RespostasPaciente[]
+
+  @@map("opcoes_resposta")
+}
+
+model Diagnostico {
+  id             String    @id @default(uuid())
+  pacienteId     String    @map("paciente_id")
+  paciente       Paciente  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  resultadoIa    String?   @map("resultado_ia")
+  probabilidade  Float?    @map("probabilidade")
+  data           DateTime  @default(now()) @map("data")
+
+  respostas      RespostasPaciente[]
+  recomendacoes  Recomendacao[]
+  feedbacks      FeedbackIa[]
+
+  @@map("diagnosticos")
+}
+
+model RespostasPaciente {
+  id             String      @id @default(uuid())
+  pacienteId     String      @map("paciente_id")
+  paciente       Paciente    @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  perguntaId     String      @map("pergunta_id")
+  pergunta       Pergunta    @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  opcaoId        String?     @map("opcao_id")
+  opcao          OpcaoResposta? @relation(fields: [opcaoId], references: [id], onDelete: SetNull)
+  valor          Int         @map("valor")
+  diagnosticoId  String?     @map("diagnostico_id")
+  diagnostico    Diagnostico? @relation(fields: [diagnosticoId], references: [id], onDelete: Cascade)
+
+  @@map("respostas_paciente")
+}
+
+model Agenda {
+  id       String   @id @default(uuid())
+  medicoId String   @map("medico_id")
+  medico   Medico   @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+  data     DateTime @db.Date @map("data")
+  horario  String   @map("horario")
+
+  agendamentos Agendamento[]
+
+  @@map("agendas")
+}
+
+model Agendamento {
+  id         String            @id @default(uuid())
+  pacienteId String            @map("paciente_id")
+  paciente   Paciente          @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  medicoId   String            @map("medico_id")
+  medico     Medico            @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+  agendaId   String            @map("agenda_id")
+  agenda     Agenda            @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  status     StatusAgendamento @default(pendente) @map("status")
+
+  @@map("agendamentos")
+}
+
+model Consulta {
+  id               String   @id @default(uuid())
+  pacienteId       String   @map("paciente_id")
+  paciente         Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  medicoId         String   @map("medico_id")
+  medico           Medico   @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+  observacoes      String?  @map("observacoes")
+  diagnosticoFinal String?  @map("diagnostico_final")
+  dataConsulta     DateTime @default(now()) @map("data_consulta")
+
+  @@map("consultas")
+}
+
+model Recomendacao {
+  id            String      @id @default(uuid())
+  diagnosticoId String      @map("diagnostico_id")
+  diagnostico   Diagnostico @relation(fields: [diagnosticoId], references: [id], onDelete: Cascade)
+  descricao     String      @map("descricao")
+
+  @@map("recomendacoes")
+}
+
+model FeedbackIa {
+  id              String      @id @default(uuid())
+  diagnosticoId   String      @map("diagnostico_id")
+  diagnostico     Diagnostico @relation(fields: [diagnosticoId], references: [id], onDelete: Cascade)
+  diagnosticoReal String?     @map("diagnostico_real")
+  correto         Boolean?    @map("correto")
+
+  @@map("feedback_ia")
+}
+
+model Account {
+  id                String  @id @default(cuid()) @map("id")
+  userId            String  @map("usuario_id")
+  type              String  @map("tipo_conta")
+  provider          String  @map("provedor")
+  providerAccountId String  @map("id_conta_provedor")
+  refresh_token     String? @db.Text @map("token_atualizacao")
+  access_token      String? @db.Text @map("token_acesso")
+  expires_at        Int?    @map("expira_em")
+  token_type        String? @map("tipo_token")
+  scope             String? @map("escopo")
+  id_token          String? @db.Text @map("id_token")
+  session_state     String? @map("estado_sessao")
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("contas")
+}
+ 
+model Session {
+  id           String   @id @default(cuid()) @map("id")
+  sessionToken String   @unique @map("token_sessao")
+  userId       String   @map("usuario_id")
+  expires      DateTime @map("expira_em")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@map("sessoes")
+}
+ 
+model VerificationToken {
+  identifier String   @map("identificador")
+  token      String   @unique @map("token")
+  expires    DateTime @map("expira_em")
+ 
+  @@unique([identifier, token])
+  @@map("tokens_verificacao")
+}
