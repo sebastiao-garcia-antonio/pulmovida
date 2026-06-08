@@ -15,8 +15,8 @@ colunas = None
 
 print("A carregar modelos na memoria... (Isto pode demorar uns segundos devido ao tamanho)")
 try:
-    colunas = joblib.load(os.path.join(BASE_DIR, "modelo treinado", "colunas_modelo (1).pkl"))
-    model = joblib.load(os.path.join(BASE_DIR, "modelo treinado", "modelo_diagnostico_v1 (1).pkl"))
+    colunas = joblib.load(os.path.join(BASE_DIR, "colunas_modelo.pkl"))
+    model = joblib.load(os.path.join(BASE_DIR, "modelo_diagnostico_v1.joblib"))
     print("Modelos de Inteligencia Artificial carregados com sucesso!")
 except Exception as e:
     print(f"Erro ao carregar o modelo ou colunas: {e}")
