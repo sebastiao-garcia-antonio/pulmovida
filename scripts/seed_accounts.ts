@@ -10,11 +10,11 @@ async function main() {
   const senhaHash = await bcrypt.hash('123456', 10);
 
   // 1. Criar Paciente
-  const pacienteUser = await prisma.usuario.upsert({
+  const pacienteUser = await prisma.user.upsert({
     where: { email: 'paciente@teste.com' },
     update: {},
     create: {
-      nome: 'Paciente Teste',
+      name: 'Paciente Teste',
       email: 'paciente@teste.com',
       senha: senhaHash,
       tipo: 'paciente',
@@ -29,11 +29,11 @@ async function main() {
   });
 
   // 2. Criar Médico
-  const medicoUser = await prisma.usuario.upsert({
+  const medicoUser = await prisma.user.upsert({
     where: { email: 'medico@teste.com' },
     update: {},
     create: {
-      nome: 'Dr. Médico Teste',
+      name: 'Dr. Médico Teste',
       email: 'medico@teste.com',
       senha: senhaHash,
       tipo: 'medico',
@@ -46,11 +46,11 @@ async function main() {
   });
 
   // 3. Criar Admin
-  const adminUser = await prisma.usuario.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: 'admin@teste.com' },
     update: {},
     create: {
-      nome: 'Administrador Teste',
+      name: 'Administrador Teste',
       email: 'admin@teste.com',
       senha: senhaHash,
       tipo: 'admin',
