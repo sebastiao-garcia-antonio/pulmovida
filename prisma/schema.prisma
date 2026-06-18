@@ -17,6 +17,9 @@ enum TipoPergunta {
   booleano
   escala
   multipla
+  sim_nao
+  multipla_escolha
+  numero
 }
 
 enum StatusAgendamento {

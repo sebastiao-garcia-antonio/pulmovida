@@ -9,20 +9,16 @@ app = FastAPI(title="Saúde Inteligente - IA API")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Variáveis globais para os modelos
-scaler = None
 model = None
 colunas = None
 
-print("A carregar modelos na memoria... (Isto pode demorar uns segundos devido ao tamanho)")
+print("A carregar modelos na memoria...")
 try:
     colunas = joblib.load(os.path.join(BASE_DIR, "colunas_modelo.pkl"))
-    model = joblib.load(os.path.join(BASE_DIR, "modelo_diagnostico_v1.joblib"))
+    model = joblib.load(os.path.join(BASE_DIR, "modelo_diagnostico_v1.pkl"))
     print("Modelos de Inteligencia Artificial carregados com sucesso!")
 except Exception as e:
     print(f"Erro ao carregar o modelo ou colunas: {e}")
-
-# O novo modelo Random Forest não requer scaler.
-scaler = None
 
 class DadosPaciente(BaseModel):
     respostas: list[float]
@@ -30,12 +26,14 @@ class DadosPaciente(BaseModel):
 class DiagnosticoResponse(BaseModel):
     diagnostico: str
     probabilidade: float
+    classe: int
 
 @app.get("/")
 def read_root():
     return {
         "status": "IA API está a correr!",
-        "modelos_carregados": model is not None
+        "modelos_carregados": model is not None,
+        "n_colunas_esperadas": len(colunas) if colunas else 0
     }
 
 @app.post("/prever", response_model=DiagnosticoResponse)
@@ -54,28 +52,30 @@ def prever_diagnostico(dados: DadosPaciente):
                 detail=f"Recebidas {len(dados.respostas)} features, mas o modelo espera {len(colunas)}."
             )
 
-        # 3. Fazer a previsão diretamente com as features (Random Forest não precisa de scaling)
-        prediction = model.predict(features)
+        # 3. Fazer a previsão
+        prediction = int(model.predict(features)[0])
         
-        # 4. Obter a probabilidade (chance matemática de ter a doença/risco)
+        # 4. Obter a probabilidade
         try:
-            probabilities = model.predict_proba(features)
-            prob_risco = float(probabilities[0][1]) # Assume classe '1' como risco positivo
+            probabilities = model.predict_proba(features)[0]
+            prob_risco = float(probabilities[prediction])
         except AttributeError:
-            # Caso o modelo não suporte probabilidades nativamente (ex: alguns SVM lineares)
-            prob_risco = 1.0 if float(prediction[0]) > 0 else 0.0
+            prob_risco = 1.0
 
-        # Mapear o risco matemático para uma etiqueta compreensível
-        if prob_risco > 0.75:
-            diag_texto = "Risco Crítico / Suspeita de Doença Respiratória Grave"
-        elif prob_risco > 0.45:
-            diag_texto = "Risco Moderado / Sintomas Respiratórios"
+        # Mapear o risco matemático para uma etiqueta compreensível (Baseado nas 4 classes)
+        if prediction == 3:
+            diag_texto = "Risco Crítico / Doença Obstrutiva Crónica (DPOC, Asma Grave)"
+        elif prediction == 2:
+            diag_texto = "Risco Alto / Condição Crónica Profunda (Ex: Fibrose, Tuberculose)"
+        elif prediction == 1:
+            diag_texto = "Risco Moderado / Infecção Aguda (Gripe, Bronquite Aguda)"
         else:
-            diag_texto = "Risco Baixo / Sintomas Leves"
+            diag_texto = "Risco Baixo / Casos Saudáveis (Sintomas Leves ou Inexistentes)"
 
         return {
             "diagnostico": diag_texto,
-            "probabilidade": prob_risco
+            "probabilidade": prob_risco,
+            "classe": prediction
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno ao prever: {str(e)}")

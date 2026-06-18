@@ -8,6 +8,7 @@ import { TipoPergunta } from "@prisma/client";
 export async function createPergunta(data: {
   texto: string;
   tipo: string;
+  categoria?: string | null;
   opcoes: { texto: string; valor: number }[];
 }) {
   const session = await auth();
@@ -19,6 +20,7 @@ export async function createPergunta(data: {
     data: {
       texto: data.texto,
       tipo: data.tipo as TipoPergunta,
+      categoria: data.categoria === "nenhuma" ? null : data.categoria,
       opcoes: {
         create: data.opcoes,
       },
@@ -34,6 +36,7 @@ export async function updatePergunta(
   data: {
     texto: string;
     tipo: string;
+    categoria?: string | null;
     opcoes: { id?: string; texto: string; valor: number }[];
   }
 ) {
@@ -41,11 +44,6 @@ export async function updatePergunta(
   if (!session?.user?.id || session.user.tipo !== "admin") {
     throw new Error("Não autorizado");
   }
-
-  // Primeiro apagamos todas as opções antigas (para simplificar a atualização, caso tenham sido removidas)
-  // Mas como Prisma tem update com upsert/delete, vamos usar um modo mais simples: apagar todas as opções existentes e recriar.
-  // Como `OpcaoResposta` pode estar ligada a `RespostasPaciente`, apagá-las e recriá-las pode quebrar o histórico (onDelete: SetNull).
-  // Então vamos tentar atualizar, criar novas e deletar as ausentes.
 
   const currentOpcoes = await prisma.opcaoResposta.findMany({ where: { perguntaId: id } });
   const incomingIds = data.opcoes.map(o => o.id).filter(Boolean) as string[];
@@ -56,6 +54,7 @@ export async function updatePergunta(
     data: {
       texto: data.texto,
       tipo: data.tipo as TipoPergunta,
+      categoria: data.categoria === "nenhuma" ? null : data.categoria,
       opcoes: {
         deleteMany: { id: { in: idsToDelete } },
         upsert: data.opcoes.map((opcao) => ({

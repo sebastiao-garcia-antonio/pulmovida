@@ -24,8 +24,8 @@ export default function QuizClient({ perguntas }: { perguntas: Pergunta[] }) {
 
   const [step, setStep] = useState(0);
   
-  // Guardamos o id da OpcaoResposta escolhida para a pergunta atual
-  const [respostas, setRespostas] = useState<Record<string, string>>({});
+  // Guardamos o id da OpcaoResposta ou o valor numérico
+  const [respostas, setRespostas] = useState<Record<string, { opcaoId?: string; valorNum?: number }>>({});
   const [showResultModal, setShowResultModal] = useState(false);
 
   if (!perguntas || perguntas.length === 0) {
@@ -43,7 +43,7 @@ export default function QuizClient({ perguntas }: { perguntas: Pergunta[] }) {
   const currentQ = perguntas[step];
 
   const handleAnswer = (opcaoId: string) => {
-    setRespostas(prev => ({ ...prev, [currentQ.id]: opcaoId }));
+    setRespostas(prev => ({ ...prev, [currentQ.id]: { opcaoId } }));
     
     // Auto-advance after a small delay for better UX
     setTimeout(() => {
@@ -53,6 +53,25 @@ export default function QuizClient({ perguntas }: { perguntas: Pergunta[] }) {
         setShowResultModal(true);
       }
     }, 300);
+  };
+
+  const handleNumberAnswer = (val: string) => {
+    const num = parseInt(val, 10);
+    if (!isNaN(num)) {
+      setRespostas(prev => ({ ...prev, [currentQ.id]: { valorNum: num } }));
+    } else {
+      const newRes = { ...respostas };
+      delete newRes[currentQ.id];
+      setRespostas(newRes);
+    }
+  };
+
+  const proceedNext = () => {
+    if (!isLasteStep) {
+      setStep(prev => prev + 1);
+    } else {
+      setShowResultModal(true);
+    }
   };
 
   const handleBack = () => {
@@ -83,6 +102,9 @@ export default function QuizClient({ perguntas }: { perguntas: Pergunta[] }) {
 
   const progressPercentage = ((step + 1) / perguntas.length) * 100;
   const currentAnswer = respostas[currentQ.id];
+  
+  // Validar se o botão "Avançar" deve estar habilitado para perguntas numéricas
+  const hasAnsweredCurrent = currentAnswer !== undefined;
 
   return (
     <div className="w-full max-w-2xl mx-auto glass-panel p-8 md:p-12 rounded-3xl animate-fade-in-up bg-white shadow-xl border border-slate-100">
@@ -113,35 +135,61 @@ export default function QuizClient({ perguntas }: { perguntas: Pergunta[] }) {
           </h2>
 
           <div className="flex w-full flex-col sm:flex-row flex-wrap justify-center gap-3">
-            {currentQ.opcoes.map((opcao) => {
-              const isSelected = currentAnswer === opcao.id;
-              
-              // Se for sim/nao com apenas 2 opcoes, dar cores diferentes
-              const isBinary = currentQ.tipo === "sim_nao" && currentQ.opcoes.length === 2;
-              const isPositiveBinary = isBinary && opcao.valor > 0;
-              
-              let btnClass = "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
-              if (isSelected) {
-                if (isPositiveBinary) {
-                  btnClass = "bg-emerald-500 text-white border-emerald-500 shadow-md ring-2 ring-offset-2 ring-emerald-500";
-                } else if (isBinary) {
-                  btnClass = "bg-slate-700 text-white border-slate-700 shadow-md ring-2 ring-offset-2 ring-slate-700";
-                } else {
-                  btnClass = "bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-offset-2 ring-blue-600";
-                }
-              }
-
-              return (
+            {currentQ.tipo === "numero" ? (
+              <div className="w-full max-w-xs mx-auto flex flex-col gap-4">
+                <input 
+                  type="number" 
+                  min="0"
+                  placeholder="Digite o valor numérico..."
+                  className="w-full px-6 py-4 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm"
+                  value={currentAnswer?.valorNum !== undefined ? currentAnswer.valorNum : ""}
+                  onChange={(e) => handleNumberAnswer(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && hasAnsweredCurrent) {
+                      proceedNext();
+                    }
+                  }}
+                  autoFocus
+                />
                 <button
-                  key={opcao.id}
-                  type="button"
-                  onClick={() => handleAnswer(opcao.id)}
-                  className={`flex-1 min-w-[140px] px-4 py-4 rounded-xl font-bold text-lg transition-all duration-200 border-2 ${btnClass}`}
+                  onClick={proceedNext}
+                  disabled={!hasAnsweredCurrent}
+                  className="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 disabled:opacity-50 disabled:bg-slate-300 transition-colors shadow-md"
                 >
-                  {opcao.texto}
+                  Confirmar e Avançar
                 </button>
-              );
-            })}
+              </div>
+            ) : (
+              currentQ.opcoes.map((opcao) => {
+                const isSelected = currentAnswer?.opcaoId === opcao.id;
+                
+                // Se for sim/nao com apenas 2 opcoes, dar cores diferentes
+                const isBinary = currentQ.tipo === "sim_nao" || currentQ.tipo === "booleano";
+                const isPositiveBinary = isBinary && opcao.valor > 0;
+                
+                let btnClass = "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
+                if (isSelected) {
+                  if (isPositiveBinary) {
+                    btnClass = "bg-emerald-500 text-white border-emerald-500 shadow-md ring-2 ring-offset-2 ring-emerald-500";
+                  } else if (isBinary) {
+                    btnClass = "bg-slate-700 text-white border-slate-700 shadow-md ring-2 ring-offset-2 ring-slate-700";
+                  } else {
+                    btnClass = "bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-offset-2 ring-blue-600";
+                  }
+                }
+
+                return (
+                  <button
+                    key={opcao.id}
+                    type="button"
+                    onClick={() => handleAnswer(opcao.id)}
+                    className={`flex-1 min-w-[140px] px-4 py-4 rounded-xl font-bold text-lg transition-all duration-200 border-2 ${btnClass}`}
+                  >
+                    {opcao.texto}
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
@@ -168,7 +216,7 @@ export default function QuizClient({ perguntas }: { perguntas: Pergunta[] }) {
           </button>
         )}
         
-        {isLasteStep && currentAnswer && (
+        {isLasteStep && currentAnswer && currentQ.tipo !== "numero" && (
           <button
             type="button"
             onClick={() => setShowResultModal(true)}

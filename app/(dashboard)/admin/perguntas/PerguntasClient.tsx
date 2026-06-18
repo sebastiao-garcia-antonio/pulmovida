@@ -13,6 +13,7 @@ type Pergunta = {
   id: string;
   texto: string;
   tipo: string;
+  categoria?: string | null;
   opcoes: OpcaoResposta[];
 };
 
@@ -25,9 +26,10 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPergunta, setSelectedPergunta] = useState<Pergunta | null>(null);
   
-  const [formData, setFormData] = useState<{ texto: string; tipo: string; opcoes: OpcaoResposta[] }>({
+  const [formData, setFormData] = useState<{ texto: string; tipo: string; categoria: string; opcoes: OpcaoResposta[] }>({
     texto: "",
     tipo: "sim_nao",
+    categoria: "nenhuma",
     opcoes: [],
   });
   
@@ -43,6 +45,7 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
     setFormData({ 
       texto: "", 
       tipo: "sim_nao", 
+      categoria: "nenhuma",
       opcoes: [
         { texto: "Sim", valor: 10 },
         { texto: "Não", valor: 0 }
@@ -57,6 +60,7 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
     setFormData({
       texto: p.texto,
       tipo: p.tipo,
+      categoria: p.categoria || "nenhuma",
       opcoes: p.opcoes.map(o => ({ ...o }))
     });
     setModalOpen(true);
@@ -92,6 +96,8 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
         { texto: "Moderada (4-7)", valor: 7 },
         { texto: "Grave (8-10)", valor: 10 }
       ];
+    } else if (novoTipo === "numero") {
+      novasOpcoes = [];
     } else {
       novasOpcoes = [
         { texto: "Opção 1", valor: 0 }
@@ -164,6 +170,7 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
       case "sim_nao": return "Sim / Não";
       case "escala": return "Escala de Gravidade";
       case "multipla_escolha": return "Múltipla Escolha";
+      case "numero": return "Numérica";
       default: return tipo;
     }
   };
@@ -202,6 +209,7 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
             <option value="sim_nao">Sim / Não</option>
             <option value="escala">Escala</option>
             <option value="multipla_escolha">Múltipla Escolha</option>
+            <option value="numero">Numérica</option>
           </select>
         </div>
 
@@ -220,6 +228,11 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
                     <span className="inline-block px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-blue-700 bg-blue-100 rounded-full">
                       {formatTipo(p.tipo)}
                     </span>
+                    {p.categoria && p.categoria !== "nenhuma" && (
+                      <span className="inline-block px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-purple-700 bg-purple-100 rounded-full">
+                        IA: {p.categoria}
+                      </span>
+                    )}
                     <h3 className="text-lg font-bold text-[#16201E]">{p.texto}</h3>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -277,6 +290,38 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
               </div>
               
               <div>
+                <label className="block text-sm font-bold text-[#16201E] mb-1.5">Variável Clínica (Integração IA)</label>
+                <select 
+                  className="saas-input w-full shadow-sm text-purple-900 bg-purple-50 border-purple-200 focus:border-purple-500 focus:ring-purple-500" 
+                  value={formData.categoria} 
+                  onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+                >
+                  <option value="nenhuma">-- Nenhuma (Apenas Anamnese Padrão) --</option>
+                  <option value="Fumante">Fumante (Sim/Não)</option>
+                  <option value="Convive_Fumantes">Convive com Fumantes (Sim/Não)</option>
+                  <option value="Trabalha_Quimicos">Trabalha com Químicos (Sim/Não)</option>
+                  <option value="Doencas_Familia">Doenças na Família (Sim/Não)</option>
+                  <option value="Tosse">Tosse (Sim/Não)</option>
+                  <option value="Tosse_Dias">Tosse: Dias (Numérica)</option>
+                  <option value="Tosse_Catarro">Tosse com Catarro (Sim/Não)</option>
+                  <option value="Tosse_Sangue">Tosse com Sangue (Sim/Não)</option>
+                  <option value="Dificuldade_Respirar">Dificuldade ao Respirar (Sim/Não)</option>
+                  <option value="Falta_Ar_Constante">Falta de Ar Constante (Sim/Não)</option>
+                  <option value="Nivel_Falta_Ar">Nível da Falta de Ar (Escala 0 a 3)</option>
+                  <option value="Chiado_Peito">Chiado no Peito (Sim/Não)</option>
+                  <option value="Febre">Febre (Sim/Não)</option>
+                  <option value="Cansaco_Frequente">Cansaço Frequente (Sim/Não)</option>
+                  <option value="Perda_Peso_Recente">Perda de Peso Recente (Sim/Não)</option>
+                  <option value="Suor_Noturno">Suor Noturno (Sim/Não)</option>
+                  <option value="Pioram_Noite">Piora à Noite (Sim/Não)</option>
+                  <option value="Saturacao_O2">Saturação de O2 % (Numérica)</option>
+                </select>
+                <p className="text-xs text-[#746F70] mt-1 italic">
+                  Associe esta pergunta a uma variável para que o modelo de IA a consiga interpretar.
+                </p>
+              </div>
+
+              <div>
                 <label className="block text-sm font-bold text-[#16201E] mb-1.5">Tipo de Resposta Esperada</label>
                 <select 
                   className="saas-input w-full shadow-sm" 
@@ -286,9 +331,11 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
                   <option value="sim_nao">Sim ou Não (Binário)</option>
                   <option value="escala">Escala de Gravidade</option>
                   <option value="multipla_escolha">Múltipla Escolha</option>
+                  <option value="numero">Resposta Numérica Livre</option>
                 </select>
               </div>
 
+              {formData.tipo !== "numero" && (
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
                 <div className="flex justify-between items-center border-b border-gray-200 pb-2">
                   <h4 className="font-bold text-[#16201E] text-sm">Opções de Resposta e Pesos Clínicos</h4>
@@ -339,6 +386,7 @@ export default function PerguntasClient({ initialPerguntas }: { initialPerguntas
                   O "Peso" indica o grau de severidade ou prioridade dessa resposta. Valores maiores indicam sintomas mais críticos (ex: Dor no peito = 90).
                 </p>
               </div>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={closeModal} className="flex-1 px-4 py-3.5 font-bold text-[#746F70] bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
