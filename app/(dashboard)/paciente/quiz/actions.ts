@@ -85,7 +85,7 @@ export async function submitQuiz(respostas: Record<string, { opcaoId?: string; v
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ respostas: featuresData }),
-      signal: AbortSignal.timeout(10000)
+      signal: AbortSignal.timeout(60000)
     });
 
     if (apiResponse.ok) {
