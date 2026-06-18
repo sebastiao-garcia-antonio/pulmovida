@@ -21,6 +21,7 @@ export default async function MedicoDashboardPage() {
   if (!medico) {
     const { signOut } = await import("@/auth");
     await signOut({ redirectTo: "/login" });
+    return null;
   }
 
   const userName = session.user.name || "Médico";

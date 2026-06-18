@@ -10,12 +10,14 @@ export default async function AdminDashboardPage() {
   if (!session?.user?.id) {
     const { signOut } = await import("@/auth");
     await signOut({ redirectTo: "/login" });
+    return null;
   }
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user) {
     const { signOut } = await import("@/auth");
     await signOut({ redirectTo: "/login" });
+    return null;
   }
 
   const userName = session.user.name || "Administrador";

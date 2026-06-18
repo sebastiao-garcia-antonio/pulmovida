@@ -22,6 +22,7 @@ export default async function PacienteDashboardPage() {
     // Vamos forçar o logout para limpar o cookie e redirecionar para o login
     const { signOut } = await import("@/auth");
     await signOut({ redirectTo: "/login" });
+    return null;
   }
 
   // 2. Fetch Próximas Consultas (pendentes ou confirmadas a partir de hoje)
