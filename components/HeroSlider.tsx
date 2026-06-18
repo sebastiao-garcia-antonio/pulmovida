@@ -8,7 +8,7 @@ const slides = [
     phrase: 'Diagnóstico inteligente e cuidados médicos ao alcance de todos.',
     subphrase: 'A Pulmo Vida utiliza inteligência artificial para oferecer triagem rápida,acompanhamento médico e acesso simplificado aos melhores profissionais de saúde',
     gradient: 'linear-gradient(135deg, rgba(229,243,255,0.45) 0%, rgba(94,187,171,0.40) 50%, rgba(74,168,154,0.45) 100%)',
-    image: '/public/images/pulmo.jpg',
+    image: '/images/pulmo.jpg',
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const slides = [
     phrase: 'Inteligência artificial que auxilia no diagnóstico com rapidez e precisão.',
     subphrase: 'Algoritmos avançados analisam sintomas para apoiar nas decisões médicas de forma segura e eficiente.',
     gradient: 'linear-gradient(135deg, rgba(94,187,171,0.45) 0%, rgba(124,200,186,0.40) 50%, rgba(168,221,211,0.45) 100%)',
-    image: '/public/images/pulmo2.avif',
+    image: '/images/pulmo2.avif',
   },
   {
     id: 4,
