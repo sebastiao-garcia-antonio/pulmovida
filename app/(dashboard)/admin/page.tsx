@@ -6,7 +6,19 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const session = await auth();
-  const userName = session?.user?.name || "Administrador";
+  
+  if (!session?.user?.id) {
+    const { signOut } = await import("@/auth");
+    await signOut({ redirectTo: "/login" });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user) {
+    const { signOut } = await import("@/auth");
+    await signOut({ redirectTo: "/login" });
+  }
+
+  const userName = session.user.name || "Administrador";
 
   // Data ranges
   const today = new Date();

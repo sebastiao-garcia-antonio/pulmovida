@@ -5,10 +5,10 @@ import { useState, useEffect } from 'react';
 const slides = [
   {
     id: 1,
-    phrase: 'Sua saúde na palma da mão, sempre que precisar.',
-    subphrase: 'Tecnologia e cuidado humano unidos para transformar sua experiência médica.',
+    phrase: 'Diagnóstico inteligente e cuidados médicos ao alcance de todos.',
+    subphrase: 'A Pulmo Vida utiliza inteligência artificial para oferecer triagem rápida,acompanhamento médico e acesso simplificado aos melhores profissionais de saúde',
     gradient: 'linear-gradient(135deg, rgba(229,243,255,0.45) 0%, rgba(94,187,171,0.40) 50%, rgba(74,168,154,0.45) 100%)',
-    image: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=1920&q=80',
+    image: '/public/images/pulmo.jpg',
   },
   {
     id: 2,
@@ -19,15 +19,15 @@ const slides = [
   },
   {
     id: 3,
-    phrase: 'Triagem inteligente em segundos, precisão em cada diagnóstico.',
-    subphrase: 'Algoritmos avançados que entendem suas necessidades de saúde.',
+    phrase: 'Inteligência artificial que auxilia no diagnóstico com rapidez e precisão.',
+    subphrase: 'Algoritmos avançados analisam sintomas para apoiar nas decisões médicas de forma segura e eficiente.',
     gradient: 'linear-gradient(135deg, rgba(94,187,171,0.45) 0%, rgba(124,200,186,0.40) 50%, rgba(168,221,211,0.45) 100%)',
-    image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1920&q=80',
+    image: '/public/images/pulmo2.avif',
   },
   {
     id: 4,
-    phrase: 'Conectamos você aos melhores especialistas do país.',
-    subphrase: 'Rede de médicos qualificados prontos para cuidar de você.',
+    phrase: 'Atendimento especializado sem sair de casa.',
+    subphrase: 'Agende consultas online ,acompanhe resultados e receba orientações médicas através de uma plataforma moderna e acessível.',
     gradient: 'linear-gradient(135deg, rgba(58,152,136,0.45) 0%, rgba(94,187,171,0.40) 50%, rgba(124,200,186,0.45) 100%)',
     image: 'https://images.unsplash.com/photo-1581594693280-645578b9f247?auto=format&fit=crop&w=1920&q=80',
   },
@@ -113,20 +113,7 @@ export default function HeroSlider() {
                 </a>
               </div>
 
-              <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-white drop-shadow">+50k</div>
-                  <div className="text-white/70 text-sm mt-1">Pacientes ativos</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-white drop-shadow">99.9%</div>
-                  <div className="text-white/70 text-sm mt-1">Precisão da IA</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-white drop-shadow">500+</div>
-                  <div className="text-white/70 text-sm mt-1">Especialistas</div>
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>

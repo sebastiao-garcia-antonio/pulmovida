@@ -65,17 +65,17 @@ const services = [
 
 export default function ServiceCards() {
   return (
-    <section id="servicos" className="py-24 bg-white">
+    <section id="servicos" className="py-24 bg-[#0B1E36]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/20 mb-4">
             <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
             <span className="text-[#3B82F6] text-sm font-semibold">Serviços</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#16201E] mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Soluções completas para sua saúde
           </h2>
-          <p className="text-lg text-[#746F70] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
             Conheça as ferramentas que transformam a experiência em saúde com tecnologia de ponta.
           </p>
         </div>
@@ -84,14 +84,14 @@ export default function ServiceCards() {
           {services.map((service, index) => (
             <div
               key={service.id}
-              className="group relative p-8 bg-[#EFF6FF]/50 rounded-2xl border border-[#BFDBFE] hover:border-[#3B82F6]/30 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="group relative p-8 bg-[#1E3A5F]/50 rounded-2xl border border-[#3B82F6]/30 hover:border-[#3B82F6]/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
             >
               <div className="w-14 h-14 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-[#3B82F6]/20 group-hover:scale-110 transition-transform duration-300">
                 {service.icon}
               </div>
 
-              <h3 className="text-xl font-bold text-[#16201E] mb-3">{service.title}</h3>
-              <p className="text-[#746F70] leading-relaxed mb-4">{service.description}</p>
+              <h3 className="text-xl font-bold text-white mb-3">{service.title}</h3>
+              <p className="text-white/80 leading-relaxed mb-4">{service.description}</p>
 
               <div className="flex items-center gap-2 text-sm font-semibold text-[#3B82F6] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <span>Saiba mais</span>

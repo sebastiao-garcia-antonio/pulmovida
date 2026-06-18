@@ -12,24 +12,24 @@ const LungsIcon = ({ className, strokeWidth }: { className?: string, strokeWidth
 
 export default function Header() {
   return (
-    <header className="fixed top-0 w-full bg-white/90 backdrop-blur-lg border-b border-[#BFDBFE]/50 z-50 shadow-sm">
+    <header className="fixed top-0 w-full bg-[#0B1E36]/90 backdrop-blur-lg border-b border-[#1E3A5F] z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center shadow-lg shadow-[#3B82F6]/25">
             <LungsIcon className="w-6 h-6 text-white" strokeWidth={1.5} />
           </div>
-          <span className="text-xl font-bold text-[#16201E] tracking-tight">Pulmo Vida</span>
+          <span className="text-xl font-bold text-white tracking-tight">Pulmo Vida</span>
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#inicio" className="text-sm font-medium text-[#746F70] hover:text-[#3B82F6] transition-colors">Início</a>
-          <a href="#sobre" className="text-sm font-medium text-[#746F70] hover:text-[#3B82F6] transition-colors">Sobre</a>
-          <a href="#servicos" className="text-sm font-medium text-[#746F70] hover:text-[#3B82F6] transition-colors">Serviços</a>
-          <a href="#contato" className="text-sm font-medium text-[#746F70] hover:text-[#3B82F6] transition-colors">Contato</a>
+          <a href="#inicio" className="text-sm font-medium text-white/80 hover:text-white transition-colors">Início</a>
+          <a href="#sobre" className="text-sm font-medium text-white/80 hover:text-white transition-colors">Sobre</a>
+          <a href="#servicos" className="text-sm font-medium text-white/80 hover:text-white transition-colors">Serviços</a>
+          <a href="#contato" className="text-sm font-medium text-white/80 hover:text-white transition-colors">Contato</a>
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium text-[#16201E] hover:text-[#3B82F6] transition-colors">
+          <Link href="/login" className="text-sm font-medium text-white hover:text-white/80 transition-colors">
             Entrar
           </Link>
           <Link href="/register" className="text-sm font-medium text-white bg-gradient-to-r from-[#3B82F6] to-[#2563EB] hover:from-[#2563EB] hover:to-[#3A9888] px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-[#3B82F6]/25 hover:shadow-xl hover:shadow-[#3B82F6]/30">

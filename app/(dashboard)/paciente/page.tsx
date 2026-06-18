@@ -18,13 +18,10 @@ export default async function PacienteDashboardPage() {
   });
 
   if (!paciente) {
-    return (
-      <div className="p-10 max-w-7xl mx-auto">
-        <div className="bg-red-50 text-red-600 p-6 rounded-xl border border-red-100 font-medium">
-          ERRO: A sua conta não está corretamente configurada como Paciente.
-        </div>
-      </div>
-    );
+    // A conta não existe mais na DB, mas o cookie ainda existe.
+    // Vamos forçar o logout para limpar o cookie e redirecionar para o login
+    const { signOut } = await import("@/auth");
+    await signOut({ redirectTo: "/login" });
   }
 
   // 2. Fetch Próximas Consultas (pendentes ou confirmadas a partir de hoje)

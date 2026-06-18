@@ -35,7 +35,7 @@ class DiagnosticoResponse(BaseModel):
 def read_root():
     return {
         "status": "IA API está a correr!",
-        "modelos_carregados": model is not None and scaler is not None
+        "modelos_carregados": model is not None
     }
 
 @app.post("/prever", response_model=DiagnosticoResponse)

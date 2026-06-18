@@ -19,14 +19,8 @@ export default async function MedicoDashboardPage() {
   });
 
   if (!medico) {
-    return (
-      <div className="p-10 max-w-7xl mx-auto">
-        <div className="bg-red-50 text-red-600 p-6 rounded-xl border border-red-100 font-medium">
-          ERRO CRÍTICO: A sua conta não está corretamente configurada como Médico na base de dados.
-          Por favor contacte o administrador do sistema.
-        </div>
-      </div>
-    );
+    const { signOut } = await import("@/auth");
+    await signOut({ redirectTo: "/login" });
   }
 
   const userName = session.user.name || "Médico";
